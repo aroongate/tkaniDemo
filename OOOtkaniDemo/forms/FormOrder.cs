@@ -68,101 +68,110 @@ namespace OOOtkaniDemo.forms
 
         private void orderButton_Click(object sender, EventArgs e)
         {
-            var app = new Microsoft.Office.Interop.Word.Application();
-            var doc = app.Documents.Add();
-            var title = doc.Paragraphs.Add();
-            title.Range.Text = "Талон заказа";
-            title.Range.Font.Size = 18;
-            title.Range.Font.Bold = 1;
-            title.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-            title.Range.InsertParagraphAfter();
-
-            Random random = new Random();
-            using (modelDB model = new modelDB())
+            try
             {
-                int nextId = model.orders.Max(o => o.id) + 1;
+                var app = new Microsoft.Office.Interop.Word.Application();
+                var doc = app.Documents.Add();
+                var title = doc.Paragraphs.Add();
+                title.Range.Text = "Талон заказа";
+                title.Range.Font.Size = 18;
+                title.Range.Font.Bold = 1;
+                title.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
+                title.Range.InsertParagraphAfter();
 
-                orders orders = new orders();
-                orders.id = nextId;
-                var par = doc.Paragraphs.Add();
-                par.Range.Text = "Дата заказа: " + DateTime.Now;
-                par.Range.InsertParagraphAfter();
-                par.Range.Text = "Номер заказа:" + nextId;
-                par.Range.InsertParagraphAfter();
-                var parItems = doc.Paragraphs.Add();
-                orders.price = price;
-                orders.price_discount = discount;
-                orders.users = null;
-                orders.code = random.Next(100, 1000);
-                orders.statuses = model.statuses.Find(1);
-                orders.pick_up_points = model.pick_up_points.Where(i => i.name == comboBox1.Text).FirstOrDefault();
-                orders.date = DateTime.Now;
-                model.orders.Add(orders);
-                model.SaveChanges();
-
-                Paragraph orderItems = doc.Paragraphs.Add();
-                orderItems.Range.Text = "Состав заказа:";
-
-                foreach (DataGridViewRow row in orderDataGridView.Rows)
+                Random random = new Random();
+                using (modelDB model = new modelDB())
                 {
-                    if (row.Cells["id"].Value != null)
+                    int nextId = model.orders.Max(o => o.id) + 1;
+
+                    orders orders = new orders();
+                    orders.id = nextId;
+                    var par = doc.Paragraphs.Add();
+                    par.Range.Text = "Дата заказа: " + DateTime.Now;
+                    par.Range.InsertParagraphAfter();
+                    par.Range.Text = "Номер заказа:" + nextId;
+                    par.Range.InsertParagraphAfter();
+                    var parItems = doc.Paragraphs.Add();
+                    orders.price = price;
+                    orders.price_discount = discount;
+                    orders.users = null;
+                    orders.code = random.Next(100, 1000);
+                    orders.statuses = model.statuses.Find(1);
+                    orders.pick_up_points = model.pick_up_points.Where(i => i.name == comboBox1.Text).FirstOrDefault();
+                    orders.date = DateTime.Now;
+                    model.orders.Add(orders);
+                    model.SaveChanges();
+
+                    Paragraph orderItems = doc.Paragraphs.Add();
+                    orderItems.Range.Text = "Состав заказа:";
+
+                    foreach (DataGridViewRow row in orderDataGridView.Rows)
                     {
-                        int goodId = (int)row.Cells["id"].Value;
+                        if (row.Cells["id"].Value != null)
+                        {
+                            int goodId = (int)row.Cells["id"].Value;
 
-                        good_order goodOrder = new good_order();
-                        goodOrder.order_id = orders.id;
-                        goodOrder.good_id = goodId;
-                        var good = model.goods.Find(goodId);
+                            good_order goodOrder = new good_order();
+                            goodOrder.order_id = orders.id;
+                            goodOrder.good_id = goodId;
+                            var good = model.goods.Find(goodId);
 
-                        Paragraph itemRow = doc.Paragraphs.Add();
-                        itemRow.Range.Text = $"{good.id}. {good.name} Цена: {good.price} руб. Скидка: {good.discount} руб.";
-                        itemRow.Range.Italic = 0;
-                        itemRow.Range.Bold = 0;
-                        itemRow.Range.InsertParagraphAfter();
+                            Paragraph itemRow = doc.Paragraphs.Add();
+                            itemRow.Range.Text = $"{good.id}. {good.name} Цена: {good.price} руб. Скидка: {good.discount} руб.";
+                            itemRow.Range.Italic = 0;
+                            itemRow.Range.Bold = 0;
+                            itemRow.Range.InsertParagraphAfter();
 
-                        model.good_order.Add(goodOrder);
+                            model.good_order.Add(goodOrder);
+                        }
                     }
+
+                    Paragraph summaPar = doc.Paragraphs.Add();
+                    summaPar.Range.Text = $"Сумма заказа: {orders.price} руб. ";
+                    summaPar.Range.Italic = 0;
+                    summaPar.Range.Bold = 0;
+                    summaPar.Range.InsertParagraphAfter();
+
+                    Paragraph salePar = doc.Paragraphs.Add();
+                    salePar.Range.Text = $"Сумма скидки: {orders.price_discount} руб.";
+                    salePar.Range.Italic = 0;
+                    salePar.Range.Bold = 0;
+                    salePar.Range.InsertParagraphAfter();
+
+                    Paragraph pickupPoint = doc.Paragraphs.Add();
+                    pickupPoint.Range.Text = "Пункт выдачи: " + model.pick_up_points.Where(i => i.name == comboBox1.Text).FirstOrDefault().name;
+                    pickupPoint.Range.Italic = 0;
+                    pickupPoint.Range.Bold = 0;
+                    pickupPoint.Range.InsertParagraphAfter();
+
+                    Paragraph pickupCode = doc.Paragraphs.Add();
+                    pickupCode.Range.Text = "Код получения: " + random.Next(100, 1000);
+                    pickupCode.Range.Bold = 1;
+                    pickupCode.Range.Italic = 1;
+                    pickupCode.Range.InsertParagraphAfter();
+
+                    Paragraph datePar = doc.Paragraphs.Add();
+                    datePar.Range.Text = "Срок доставки: 3 дня";
+                    datePar.Range.Italic = 0;
+                    datePar.Range.Bold = 0;
+                    datePar.Range.InsertParagraphAfter();
+
+                    object path = "D:\\ttt.pdf";
+
+                    doc.SaveAs(path, WdSaveFormat.wdFormatPDF);
+
+                    Document docMem = app.Documents.Open(ref path);
+
+                    
+                    app.Visible = true;
+                    model.SaveChanges();
+
+                    MessageBox.Show("Успешно заказано");
                 }
-
-                Paragraph summaPar = doc.Paragraphs.Add();
-                summaPar.Range.Text = $"Сумма заказа: {orders.price} руб. ";
-                summaPar.Range.Italic = 0;
-                summaPar.Range.Bold = 0;
-                summaPar.Range.InsertParagraphAfter();
-
-                Paragraph salePar = doc.Paragraphs.Add();
-                salePar.Range.Text = $"Сумма скидки: {orders.price_discount} руб.";
-                salePar.Range.Italic = 0;
-                salePar.Range.Bold = 0;
-                salePar.Range.InsertParagraphAfter();
-
-                Paragraph pickupPoint = doc.Paragraphs.Add();
-                pickupPoint.Range.Text = "Пункт выдачи: " + model.pick_up_points.Where(i => i.name == comboBox1.Text).FirstOrDefault().name;
-                pickupPoint.Range.Italic = 0;
-                pickupPoint.Range.Bold = 0;
-                pickupPoint.Range.InsertParagraphAfter();
-
-                Paragraph pickupCode = doc.Paragraphs.Add();
-                pickupCode.Range.Text = "Код получения: " + random.Next(100, 1000); 
-                pickupCode.Range.Bold = 1;
-                pickupCode.Range.Italic = 1;
-                pickupCode.Range.InsertParagraphAfter();
-
-                Paragraph datePar = doc.Paragraphs.Add();
-                datePar.Range.Text = "Срок доставки: 3 дня";
-                datePar.Range.Italic = 0;
-                datePar.Range.Bold = 0;
-                datePar.Range.InsertParagraphAfter();
-
-                object path = "D:\\ttt.pdf";
-
-                doc.SaveAs(path, WdSaveFormat.wdFormatPDF);
-
-                doc.Close();
-                app.Quit();
-                model.SaveChanges();
-
-                MessageBox.Show("Успешно заказано");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Нет соединения с базой данных");
             }
         }
     }

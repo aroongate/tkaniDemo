@@ -28,19 +28,26 @@ namespace OOOtkaniDemo.forms
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            using(modelDB model = new modelDB())
+            try
             {
-                goods goods = new goods();
-                goods.name = nameTextBox.Text;
-                goods.description = descriptionTextBox.Text;
-                goods.price = Convert.ToDouble(priceTextBox.Text);
-                goods.manufacturer_id = (int)manufactuterComboBox.SelectedValue;
-                goods.discount = Convert.ToInt32(discountTextBox.Text);
-                goods.count = Convert.ToInt32(countTextBox.Text);
-                model.goods.Add(goods);
-                model.SaveChanges();
-                MessageBox.Show("Успешно создано");
-                Hide();
+                using (modelDB model = new modelDB())
+                {
+                    goods goods = new goods();
+                    goods.name = nameTextBox.Text;
+                    goods.description = descriptionTextBox.Text;
+                    goods.price = Convert.ToDouble(priceTextBox.Text);
+                    goods.manufacturer_id = (int)manufactuterComboBox.SelectedValue;
+                    goods.discount = Convert.ToInt32(discountTextBox.Text);
+                    goods.count = Convert.ToInt32(countTextBox.Text);
+                    model.goods.Add(goods);
+                    model.SaveChanges();
+                    MessageBox.Show("Успешно создано");
+                    Hide();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Нет соединения с базой данных");    
             }
         }
     }

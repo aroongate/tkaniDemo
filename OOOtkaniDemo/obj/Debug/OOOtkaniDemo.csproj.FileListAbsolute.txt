@@ -18,3 +18,4 @@ C:\Users\avdoy\source\repos\OOOtkaniDemo\OOOtkaniDemo\obj\Debug\OOOtkaniDemo.for
 C:\Users\avdoy\source\repos\OOOtkaniDemo\OOOtkaniDemo\obj\Debug\OOOtkaniDemo.forms.FormCreateGood.resources
 C:\Users\avdoy\source\repos\OOOtkaniDemo\OOOtkaniDemo\obj\Debug\OOOtkaniDemo.forms.FormUpdateGood.resources
 C:\Users\avdoy\source\repos\OOOtkaniDemo\OOOtkaniDemo\obj\Debug\OOOtkaniDemo.csproj.ResolveComReference.cache
+C:\Users\avdoy\source\repos\OOOtkaniDemo\OOOtkaniDemo\obj\Debug\OOOtkaniDemo.forms.FormAutorization.resources

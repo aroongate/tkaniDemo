@@ -15,10 +15,12 @@ namespace OOOtkaniDemo
 {
     public partial class FormGoods : Form
     {
-        private List<goodsViev> goodsView = new List<goodsViev>(); 
-        public FormGoods()
+        private List<goodsViev> goodsView = new List<goodsViev>();
+        private string role;
+        public FormGoods(string role)
         {
             InitializeComponent();
+            this.role = role;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -37,8 +39,10 @@ namespace OOOtkaniDemo
 
         private void ContextMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            DataGridView dataGridView = goodsDataGridView;
-            switch (e.ClickedItem.Text)
+            try
+            {
+                DataGridView dataGridView = goodsDataGridView;
+                switch (e.ClickedItem.Text)
                 {
                     case "Добавить к заказу":
                         if (dataGridView != null && dataGridView.SelectedRows.Count > 0)
@@ -56,32 +60,37 @@ namespace OOOtkaniDemo
                             }
                         }
                         break;
-                case "Создать товар":
-                    FormCreateGood formCreateGood = new FormCreateGood();
-                    formCreateGood.Show();
-                    break;
-                case "Редактировать товар":
-                    if (dataGridView != null && dataGridView.SelectedRows.Count > 0)
-                    {
-                        int selectedRow = dataGridView.SelectedRows[0].Index;
-                        int cellValue = Convert.ToInt32(dataGridView["dataGridViewTextBoxColumn1", selectedRow].Value);
-                        FormUpdateGood formUpdateGood = new FormUpdateGood(cellValue);
-                        formUpdateGood.Show();
-                    }
-                    break;
-                case "Удалить товар":
-                    if (dataGridView != null && dataGridView.SelectedRows.Count > 0)
-                    {
-                        int selectedRow = dataGridView.SelectedRows[0].Index;
-                        int cellValue = Convert.ToInt32(dataGridView["dataGridViewTextBoxColumn1", selectedRow].Value);
-                        using (modelDB model = new modelDB())
+                    case "Создать товар":
+                        FormCreateGood formCreateGood = new FormCreateGood();
+                        formCreateGood.Show();
+                        break;
+                    case "Редактировать товар":
+                        if (dataGridView != null && dataGridView.SelectedRows.Count > 0)
                         {
-                            model.goods.Remove(model.goods.Find(cellValue));
-                            model.SaveChanges();
-                            goodsDataGridView.DataSource = model.goodsViev.ToList();
+                            int selectedRow = dataGridView.SelectedRows[0].Index;
+                            int cellValue = Convert.ToInt32(dataGridView["dataGridViewTextBoxColumn1", selectedRow].Value);
+                            FormUpdateGood formUpdateGood = new FormUpdateGood(cellValue);
+                            formUpdateGood.Show();
                         }
-                    }
-                    break;
+                        break;
+                    case "Удалить товар":
+                        if (dataGridView != null && dataGridView.SelectedRows.Count > 0)
+                        {
+                            int selectedRow = dataGridView.SelectedRows[0].Index;
+                            int cellValue = Convert.ToInt32(dataGridView["dataGridViewTextBoxColumn1", selectedRow].Value);
+                            using (modelDB model = new modelDB())
+                            {
+                                model.goods.Remove(model.goods.Find(cellValue));
+                                model.SaveChanges();
+                                goodsDataGridView.DataSource = model.goodsViev.ToList();
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Нет соединения с базой данных");
             }
         }
 
@@ -90,10 +99,15 @@ namespace OOOtkaniDemo
             if (e.RowIndex >= 0)
             {
                 ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-                contextMenuStrip.Items.Add("Добавить к заказу");
-                contextMenuStrip.Items.Add("Создать товар");
-                contextMenuStrip.Items.Add("Редактировать товар");
-                contextMenuStrip.Items.Add("Удалить товар");
+                if(role == "Администратор")
+                {
+                    contextMenuStrip.Items.Add("Создать товар");
+                    contextMenuStrip.Items.Add("Редактировать товар");
+                    contextMenuStrip.Items.Add("Удалить товар");
+                } else if (role == "Клиент")
+                {
+                    contextMenuStrip.Items.Add("Добавить к заказу");
+                }            
                 contextMenuStrip.ItemClicked += ContextMenuStrip_ItemClicked;
                 e.ContextMenuStrip = contextMenuStrip;
             }
@@ -113,11 +127,23 @@ namespace OOOtkaniDemo
 
         private void FormGoods_Activated(object sender, EventArgs e)
         {
-            using(modelDB model = new modelDB())
+            try
             {
-                goodsDataGridView.DataSource = model.goodsViev.ToList();
+                using (modelDB model = new modelDB())
+                {
+                    goodsDataGridView.DataSource = model.goodsViev.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Нет соединения с базой данных");
             }
            
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

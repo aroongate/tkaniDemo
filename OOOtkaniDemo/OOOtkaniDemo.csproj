@@ -75,6 +75,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>fabricsDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="forms\FormAutorization.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\FormAutorization.Designer.cs">
+      <DependentUpon>FormAutorization.cs</DependentUpon>
+    </Compile>
     <Compile Include="forms\FormCreateGood.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="forms\FormAutorization.resx">
+      <DependentUpon>FormAutorization.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="forms\FormCreateGood.resx">
       <DependentUpon>FormCreateGood.cs</DependentUpon>
     </EmbeddedResource>
